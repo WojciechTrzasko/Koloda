@@ -75,6 +75,7 @@ public extension KolodaViewDelegate {
     func kolodaDidResetCard(_ koloda: KolodaView) {}
     func kolodaSwipeThresholdRatioMargin(_ koloda: KolodaView) -> CGFloat? { return nil}
     func koloda(_ koloda: KolodaView, didShowCardAt index: Int) {}
+    unc koloda(_ koloda: KolodaView, didRevertCardAt index: Int) {}
     func koloda(_ koloda: KolodaView, shouldDragCardAt index: Int ) -> Bool { return true }
     
 }
