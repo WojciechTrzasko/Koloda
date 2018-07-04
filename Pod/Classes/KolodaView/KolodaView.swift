@@ -56,6 +56,7 @@ public protocol KolodaViewDelegate: class {
     func kolodaDidResetCard(_ koloda: KolodaView)
     func kolodaSwipeThresholdRatioMargin(_ koloda: KolodaView) -> CGFloat?
     func koloda(_ koloda: KolodaView, didShowCardAt index: Int)
+    func koloda(_ koloda: KolodaView, didRevertCardAt index: Int)
     func koloda(_ koloda: KolodaView, shouldDragCardAt index: Int ) -> Bool
     
 }
@@ -74,6 +75,7 @@ public extension KolodaViewDelegate {
     func kolodaDidResetCard(_ koloda: KolodaView) {}
     func kolodaSwipeThresholdRatioMargin(_ koloda: KolodaView) -> CGFloat? { return nil}
     func koloda(_ koloda: KolodaView, didShowCardAt index: Int) {}
+    func koloda(_ koloda: KolodaView, didRevertCardAt index: Int) {}
     func koloda(_ koloda: KolodaView, shouldDragCardAt index: Int ) -> Bool { return true }
     
 }
@@ -441,7 +443,7 @@ open class KolodaView: UIView, DraggableCardDelegate {
         }
     }
     
-    public func revertAction(direction: SwipeResultDirection? = nil) {
+    public func revertAction(direction: SwipeResultDirection? = nil, completion: (() -> Void)? = nil) {
         guard currentCardIndex > 0 && !animationSemaphore.isAnimating else {
             return
         }
@@ -471,7 +473,10 @@ open class KolodaView: UIView, DraggableCardDelegate {
                 }
                 
                 _self.animationSemaphore.decrement()
+                _self.delegate?.koloda(_self, didRevertCardAt: _self.currentCardIndex)
                 _self.delegate?.koloda(_self, didShowCardAt: _self.currentCardIndex)
+                
+                completion?()
             })
         }
         
@@ -554,7 +559,7 @@ open class KolodaView: UIView, DraggableCardDelegate {
         }
     }
     
-    public func swipe(_ direction: SwipeResultDirection, force: Bool = false) {
+    public func swipe(_ direction: SwipeResultDirection, force: Bool = false, completion: (() -> Void)? = nil) {
         let shouldSwipe = delegate?.koloda(self, shouldSwipeCardAt: currentCardIndex, in: direction) ?? true
         guard force || shouldSwipe else {
             return
@@ -575,6 +580,7 @@ open class KolodaView: UIView, DraggableCardDelegate {
                 
                 frontCard.swipe(direction) {
                     self.animationSemaphore.decrement()
+                    completion?()
                 }
                 frontCard.delegate = nil
             }
