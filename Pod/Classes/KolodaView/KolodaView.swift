@@ -538,6 +538,13 @@ open class KolodaView: UIView, DraggableCardDelegate {
         if currentCardIndex == 0 {
             clear()
         }
+        else {
+            for card in visibleCards {
+                card.removeFromSuperview()
+            }
+            
+            visibleCards.removeAll(keepingCapacity: true)
+        }
         
         countOfCards = Int(numberOfCards)
         if countOfCards - (currentCardIndex + visibleCards.count) > 0 {
